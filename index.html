@@ -371,5 +371,33 @@ showNetwork("MTN",document.querySelector(".network"));
 const SUPABASE_URL ="https://ejbbcyoggohjhegiwgqk.supabase.co/rest/v1/"
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP"
 </script>
+ 
+<!-- Manuel Data Shop customer dashboard -->
+<section id="customer-dashboard" style="max-width:600px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px;font-family:Arial,sans-serif;">
+  <h2>Manuel Data Shop</h2>
+  <h3>Customer Login / Sign Up</h3>
+  <p>Create an account or sign in to view your orders.</p>
+
+  <form id="customer-auth-form">
+    <label for="customer-email">Email address</label>
+    <input id="customer-email" type="email" required
+      style="display:block;width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;">
+
+    <label for="customer-password">Password</label>
+    <input id="customer-password" type="password" minlength="6" required
+      style="display:block;width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;">
+
+    <button type="button" id="customer-signup">Create account</button>
+    <button type="submit">Log in</button>
+    <button type="button" id="customer-logout" hidden>Log out</button>
+  </form>
+
+  <p id="customer-auth-message" role="status"></p>
+  <div id="customer-orders" hidden>
+    <h3>Your orders</h3>
+    <p id="customer-orders-message">Sign in to load your orders.</p>
+  </div>
+</section>
+
 </body>
 </html>
