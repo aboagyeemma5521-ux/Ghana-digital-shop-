@@ -1,78 +1,365 @@
+
+
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manuel Data Shop</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f2fff5;
-      color: #222;
-    }
-    header {
-      background: #087b3b;
-      color: white;
-      text-align: center;
-      padding: 25px 15px;
-    }
-    main {
-      max-width: 700px;
-      margin: auto;
-      padding: 20px;
-    }
-    section {
-      background: white;
-      padding: 18px;
-      margin: 16px 0;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px #ddd;
-    }
-    h2 { color: #087b3b; }
-    .button {
-      display: inline-block;
-      background: #087b3b;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 8px;
-      text-decoration: none;
-      margin-top: 8px;
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #e0f4e6;
-    }
-  </style>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Manuel Data Shop | Buy Data & Checker PINs</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#17243b}
+
+header{background:#092b57;color:white;padding:28px 16px;text-align:center}
+
+header h1{margin:0 0 8px;font-size:29px}
+
+header p{margin:0;color:#e4edff}
+
+nav{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;padding:14px;background:white}
+
+nav a{color:#092b57;text-decoration:none;font-weight:bold;padding:9px}
+
+main{max-width:850px;margin:auto;padding:16px}
+
+section{margin:0 0 22px}
+
+h2{color:#092b57}
+
+.intro{background:#e3edff;padding:17px;border-radius:12px}
+
+.networks{display:flex;gap:8px;flex-wrap:wrap}
+
+.network{background:white;border:1px solid #d6deea;border-radius:10px;padding:12px 17px;font-weight:bold;cursor:pointer}
+
+.network.active{background:#092b57;color:white}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+
+.card{background:white;border:1px solid #e0e6ef;border-radius:13px;padding:15px;box-shadow:0 3px 9px #142b4b0b}
+
+.card h3{margin:0 0 8px}
+
+.price{font-size:21px;font-weight:bold;color:#087a48;margin:12px 0}
+
+button{border:0;background:#087a48;color:white;padding:12px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer}
+
+.card button{width:100%}
+
+form{background:white;padding:18px;border-radius:12px}
+
+label{display:block;font-weight:bold;margin:14px 0 6px}
+
+input,select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}
+
+form button{width:100%;margin-top:16px}
+
+.small{font-size:13px;color:#64748b;line-height:1.6}
+
+.pin{background:white;padding:18px;border-radius:12px;border:1px solid #e0e6ef}
+
+footer{text-align:center;padding:25px;color:#64748b}
+
+</style>
+
 </head>
+
 <body>
-  <header>
-    <h1>Manuel Data Shop</h1>
-    <p>Your trusted data and checker PIN shop in Ghana</p>
-  </header>
-  <main>
-    <section>
-      <h2>Buy Data Bundles</h2>
-      <p>Choose your network to order data bundles.</p>
-      <p><strong>MTN Ghana</strong></p>
-      <p><strong>Telecel Ghana</strong></p>
-      <p><strong>AT Ghana</strong></p>
-      <a class="button" href="https://wa.me/233530275829?text=Hello%20Manuel%20Data%20Shop%2C%20I%20want%20to%20buy%20data.">Order Data on WhatsApp</a>
-    </section>
-    <section>
-      <h2>WASSCE & BECE Checker PINs</h2>
-      <p>Contact us to ask about available checker PINs.</p>
-      <a class="button" href="https://wa.me/233530275829?text=Hello%20Manuel%20Data%20Shop%2C%20I%20want%20to%20ask%20about%20a%20checker%20PIN.">Ask About Checker PINs</a>
-    </section>
-    <section>
-      <h2>Contact Us</h2>
-      <p>WhatsApp: 0530275829</p>
-      <a class="button" href="https://wa.me/233530275829">Chat with Us</a>
-    </section>
-  </main>
-  <footer>
-    <p>&copy; 2026 Manuel Data Shop</p>
-  </footer>
+
+<header>
+
+<h1>Manuel Data Shop</h1>
+
+<p>Your shop for data bundles and examination checker PINs</p>
+
+</header>
+
+<nav>
+
+<a href="#data">Buy Data</a>
+
+<a href="#wassce">WASSCE PIN</a>
+
+<a href="#bece">BECE PIN</a>
+
+</nav>
+
+<main>
+
+<div class="intro">
+
+<h2>Welcome to Manuel Data Shop!</h2>
+
+<p>Choose your network, select a bundle, and place your order.</p>
+
+</div>
+
+<section id="data">
+
+<h2>Buy Data Bundles</h2>
+
+<p>Select a network to view available bundles.</p>
+
+<div class="networks">
+
+<button class="network active" onclick="showNetwork('MTN',this)">MTN</button>
+
+<button class="network" onclick="showNetwork('Telecel',this)">Telecel</button>
+
+<button class="network" onclick="showNetwork('AT',this)">AT</button>
+
+</div>
+
+<p class="small">Prices below are examples. Update them to your real selling prices before publishing.</p>
+
+<div id="bundles" class="grid"></div>
+
+</section>
+
+<section id="checkout">
+
+<h2>Place Your Data Order</h2>
+
+<form onsubmit="dataOrder(event)">
+
+<label for="chosenNetwork">Network</label>
+
+<select id="chosenNetwork" required>
+
+<option>MTN</option><option>Telecel</option><option>AT</option>
+
+</select>
+
+<label for="chosenBundle">Bundle</label>
+
+<select id="chosenBundle" required>
+
+<option value="">Choose a bundle</option>
+
+</select>
+
+<label for="customerPhone">Phone number receiving data</label>
+
+<input id="customerPhone" type="tel" placeholder="e.g. 0241234567" required>
+
+<button type="submit">Continue with Order</button>
+
+<p class="small">Your order will be sent to our business WhatsApp for confirmation. Online payment and automatic delivery are not connected yet.</p>
+
+</form>
+
+</section>
+
+<section id="wassce">
+
+<div class="pin">
+
+<h2>WASSCE Checker PIN</h2>
+
+<p>Request a WASSCE result checker PIN.</p>
+
+<form onsubmit="pinOrder(event,'WASSCE')">
+
+<label for="wphone">Your phone number</label>
+
+<input id="wphone" type="tel" placeholder="e.g. 0241234567" required>
+
+<label for="wqty">Quantity</label>
+
+<select id="wqty"><option>1</option><option>2</option><option>3</option><option>5</option></select>
+
+<button type="submit">Order WASSCE PIN</button>
+
+</form>
+
+</div>
+
+</section>
+
+<section id="bece">
+
+<div class="pin">
+
+<h2>BECE Checker PIN</h2>
+
+<p>Request a BECE result checker PIN.</p>
+
+<form onsubmit="pinOrder(event,'BECE')">
+
+<label for="bphone">Your phone number</label>
+
+<input id="bphone" type="tel" placeholder="e.g. 0241234567" required>
+
+<label for="bqty">Quantity</label>
+
+<select id="bqty"><option>1</option><option>2</option><option>3</option><option>5</option></select>
+
+<button type="submit">Order BECE PIN</button>
+
+</form>
+
+</div>
+
+</section>
+
+<section class="intro">
+
+<h2>Need help?</h2>
+
+<p>Contact Manuel Data Shop on WhatsApp: 0530275829</p>
+
+<p class="small">Checker PIN availability and prices must be confirmed. Genuine suppliers can be connected later for online payment and automatic delivery.</p>
+
+</section>
+
+</main>
+
+<footer>© 2026 Manuel Data Shop</footer>
+
+<script>
+
+// EDIT THESE EXAMPLE PRICES BEFORE YOU START SELLING.
+
+const prices = {
+
+ MTN: {"1 GB":10,"2 GB":18,"3 GB":25,"5 GB":40,"10 GB":75,"20 GB":140},
+
+ Telecel: {"1 GB":10,"2 GB":18,"3 GB":25,"5 GB":40,"10 GB":75,"20 GB":140},
+
+ AT: {"1 GB":10,"2 GB":18,"3 GB":25,"5 GB":40,"10 GB":75,"20 GB":140}
+
+};
+
+let currentNetwork = "MTN";
+
+const waNumber = "233530275829";
+
+function showNetwork(network,button){
+
+ currentNetwork = network;
+
+ document.querySelectorAll(".network").forEach(b=>b.classList.remove("active"));
+
+ button.classList.add("active");
+
+ document.getElementById("chosenNetwork").value = network;
+
+ const container = document.getElementById("bundles");
+
+ container.innerHTML = "";
+
+ Object.entries(prices[network]).forEach(([bundle,price])=>{
+
+  const card = document.createElement("div");
+
+  card.className = "card";
+
+  const title = document.createElement("h3");
+
+  title.textContent = network + " " + bundle;
+
+  const amount = document.createElement("div");
+
+  amount.className = "price";
+
+  amount.textContent = "GH₵" + price.toFixed(2);
+
+  const buy = document.createElement("button");
+
+  buy.textContent = "Buy Now";
+
+  buy.onclick = ()=>{
+
+   document.getElementById("chosenNetwork").value = network;
+
+   document.getElementById("chosenBundle").value = bundle;
+
+   document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
+
+  };
+
+  card.append(title,amount,buy);
+
+  container.appendChild(card);
+
+ });
+
+ const select = document.getElementById("chosenBundle");
+
+ select.innerHTML = '<option value="">Choose a bundle</option>';
+
+ Object.keys(prices[network]).forEach(bundle=>{
+
+  const option = document.createElement("option");
+
+  option.value = bundle;
+
+  option.textContent = bundle + " - GH₵" + prices[network][bundle].toFixed(2);
+
+  select.appendChild(option);
+
+ });
+
+}
+
+function sendWhatsApp(message){
+
+ window.location.href = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
+
+}
+
+function dataOrder(event){
+
+ event.preventDefault();
+
+ const network = document.getElementById("chosenNetwork").value;
+
+ const bundle = document.getElementById("chosenBundle").value;
+
+ const phone = document.getElementById("customerPhone").value.trim();
+
+ if(!bundle){alert("Please choose a data bundle.");return;}
+
+ const price = prices[network][bundle];
+
+ sendWhatsApp("MANUEL DATA SHOP - DATA ORDER\nNetwork: "+network+
+
+ "\nBundle: "+bundle+"\nRecipient phone: "+phone+
+
+ "\nListed price: GH₵"+price.toFixed(2)+
+
+ "\nPlease confirm availability and payment.");
+
+}
+
+function pinOrder(event,exam){
+
+ event.preventDefault();
+
+ const prefix = exam === "WASSCE" ? "w" : "b";
+
+ const phone = document.getElementById(prefix+"phone").value.trim();
+
+ const qty = document.getElementById(prefix+"qty").value;
+
+ sendWhatsApp("MANUEL DATA SHOP - "+exam+" PIN ORDER\nQuantity: "+qty+
+
+ "\nCustomer phone: "+phone+"\nPlease confirm PIN availability, price and payment.");
+
+}
+
+showNetwork("MTN",document.querySelector(".network"));
+
+</script>
+
 </body>
+
 </html>
