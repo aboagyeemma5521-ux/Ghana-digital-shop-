@@ -440,7 +440,7 @@ document.getElementById("customer-auth-form").onsubmit = async (event) => {
 
 <script>
 (async function () {
-  const client = window.supabaseClient || null;
+  const client = supabaseClient;;
 
   if (!client) {
     document.getElementById("my-dashboard").style.display = "block";
