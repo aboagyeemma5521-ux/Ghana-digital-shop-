@@ -399,5 +399,36 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP
   </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+const emailInput = document.getElementById("customer-email");
+const passwordInput = document.getElementById("customer-password");
+const message = document.getElementById("customer-auth-message");
+
+document.getElementById("customer-signup").onclick = async () => {
+  const { error } = await supabaseClient.auth.signUp({
+    email: emailInput.value.trim(),
+    password: passwordInput.value
+  });
+  message.textContent = error
+    ? error.message
+    : "Account created. Check your email if confirmation is required.";
+};
+
+document.getElementById("customer-auth-form").onsubmit = async (event) => {
+  event.preventDefault();
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: emailInput.value.trim(),
+    password: passwordInput.value
+  });
+  message.textContent = error ? error.message : "Login successful!";
+};
+</script>
+
 </body>
 </html>
