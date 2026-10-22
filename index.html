@@ -130,6 +130,23 @@ footer{text-align:center;padding:25px;color:#64748b}
 
 </head>
 
+<!-- Manuel Data Shop top menu -->
+<div style="background:#123b70;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center;">
+  <strong>Manuel Data Shop</strong>
+  <button type="button"
+    onclick="var m=document.getElementById('shop-menu');m.style.display=m.style.display==='block'?'none':'block';"
+    style="background:none;color:white;border:none;font-size:30px;cursor:pointer;">
+    ☰
+  </button>
+</div>
+
+<div id="shop-menu" style="display:none;background:white;border:1px solid #ddd;padding:10px;">
+  <a href="#customer-dashboard" style="display:block;padding:12px;">Dashboard</a>
+  <a href="#customer-auth-form" style="display:block;padding:12px;">Login / Sign Up</a>
+  <a href="#customer-orders" style="display:block;padding:12px;">My Orders</a>
+</div>
+<!-- End top menu -->
+
 <body>
 
 <header>
