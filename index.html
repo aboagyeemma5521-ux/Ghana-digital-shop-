@@ -1,4 +1,62 @@
 
+<!-- Manuel Data Shop Menu -->
+<style>
+#mds-menu-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #123b70;
+  color: white;
+  position: relative;
+  z-index: 999;
+}
+#mds-menu-button {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+}
+#mds-menu-links {
+  display: none;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+#mds-menu-links a {
+  display: block;
+  padding: 12px;
+  color: #123b70;
+  text-decoration: none;
+}
+#mds-menu-links a:hover {
+  background: #eee;
+}
+</style>
+
+<div id="mds-menu-bar">
+  <strong>Manuel Data Shop</strong>
+  <button id="mds-menu-button" type="button"
+    aria-label="Open menu" aria-expanded="false">☰</button>
+</div>
+
+<nav id="mds-menu-links">
+  <a href="#customer-dashboard">Dashboard</a>
+  <a href="#customer-dashboard">My Orders</a>
+  <a href="#customer-auth-form">Login / Sign Up</a>
+</nav>
+
+<script>
+document.getElementById("mds-menu-button").onclick = function () {
+  const menu = document.getElementById("mds-menu-links");
+  const opening = menu.style.display !== "block";
+  menu.style.display = opening ? "block" : "none";
+  this.setAttribute("aria-expanded", String(opening));
+};
+</script>
+<!-- End Manuel Data Shop Menu -->
+
 
 <!DOCTYPE html>
 
