@@ -330,7 +330,22 @@ async function showNetwork(network) {
 
  container.innerHTML = "";
 
- Object.entries(prices[network]).forEach(([bundle,price])=>{
+ const { data: bundlePrices, error } = await supabaseClient
+  .from("bundle_prices")
+  .select("network, bundle, price_ghs")
+  .eq("network", network);
+
+if (error) {
+  alert("Could not load bundle prices: " + error.message);
+  return;
+}
+
+const selectedPrices = {};
+bundlePrices.forEach(item => {
+  selectedPrices[item.bundle] = Number(item.price_ghs);
+});
+
+Object.entries(selectedPrices).forEach
 
   const card = document.createElement("div");
 
