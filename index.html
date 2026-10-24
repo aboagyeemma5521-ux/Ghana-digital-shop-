@@ -316,87 +316,79 @@ let currentNetwork = "MTN";
 
 const waNumber = "233530275829";
 
-async function showNetwork(network) {
 
- currentNetwork = network;
+async function showNetwork(network, button) {
+  currentNetwork = network;
 
- document.querySelectorAll(".network").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".network").forEach(b =>
+    b.classList.remove("active")
+  );
 
- button.classList.add("active");
+  if (button) button.classList.add("active");
 
- document.getElementById("chosenNetwork").value = network;
+  document.getElementById("chosenNetwork").value = network;
 
- const container = document.getElementById("bundles");
+  const container = document.getElementById("bundles");
+  container.innerHTML = "Loading prices...";
 
- container.innerHTML = "";
+  const { data: bundlePrices, error } = await supabaseClient
+    .from("bundle_prices")
+    .select("network, bundle, price_ghs")
+    .eq("network", network);
 
- const { data: bundlePrices, error } = await supabaseClient
-  .from("bundle_prices")
-  .select("network, bundle, price_ghs")
-  .eq("network", network);
+  if (error) {
+    container.innerHTML = "Could not load prices. Please try again.";
+    alert("Could not load prices: " + error.message);
+    return;
+  }
 
-if (error) {
-  alert("Could not load bundle prices: " + error.message);
-  return;
-}
+  if (!bundlePrices || bundlePrices.length === 0) {
+    container.innerHTML = "No bundle prices found for " + network + ".";
+    return;
+  }
 
-const selectedPrices = {};
-bundlePrices.forEach(item => {
-  selectedPrices[item.bundle] = Number(item.price_ghs);
-});
+  container.innerHTML = "";
 
-Object.entries(selectedPrices).forEach(([bundle, price]) => {
+  const selectedPrices = {};
+  bundlePrices.forEach(item => {
+    selectedPrices[item.bundle] = Number(item.price_ghs);
+  });
 
-  const card = document.createElement("div");
+  Object.entries(selectedPrices).forEach(([bundle, price]) => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-  card.className = "card";
+    const title = document.createElement("h3");
+    title.textContent = network + " " + bundle;
 
-  const title = document.createElement("h3");
+    const amount = document.createElement("div");
+    amount.className = "price";
+    amount.textContent = "GH₵" + price.toFixed(2);
 
-  title.textContent = network + " " + bundle;
+    const buy = document.createElement("button");
+    buy.textContent = "Buy Now";
 
-  const amount = document.createElement("div");
+    buy.onclick = () => {
+      document.getElementById("chosenNetwork").value = network;
+      document.getElementById("chosenBundle").value = bundle;
+      document.getElementById("checkout").scrollIntoView({
+        behavior: "smooth"
+      });
+    };
 
-  amount.className = "price";
+    card.append(title, amount, buy);
+    container.appendChild(card);
+  });
 
-  amount.textContent = "GH₵" + price.toFixed(2);
+  const select = document.getElementById("chosenBundle");
+  select.innerHTML = '<option value="">Choose a bundle</option>';
 
-  const buy = document.createElement("button");
-
-  buy.textContent = "Buy Now";
-
-  buy.onclick = ()=>{
-
-   document.getElementById("chosenNetwork").value = network;
-
-   document.getElementById("chosenBundle").value = bundle;
-
-   document.getElementById("checkout").scrollIntoView({behavior:"smooth"});
-
-  };
-
-  card.append(title,amount,buy);
-
-  container.appendChild(card);
-
- });
-
- const select = document.getElementById("chosenBundle");
-
- select.innerHTML = '<option value="">Choose a bundle</option>';
-
- Object.keys(prices[network]).forEach(bundle=>{
-
-  const option = document.createElement("option");
-
-  option.value = bundle;
-
-  option.textContent = bundle + " - GH₵" + prices[network][bundle].toFixed(2);
-
-  select.appendChild(option);
-
- });
-
+  Object.entries(selectedPrices).forEach(([bundle, price]) => {
+    const option = document.createElement("option");
+    option.value = bundle;
+    option.textContent = bundle + " - GH₵" + price.toFixed(2);
+    select.appendChild(option);
+  });
 }
 
 function sendWhatsApp(message){
