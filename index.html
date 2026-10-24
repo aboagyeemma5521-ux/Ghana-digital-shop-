@@ -345,7 +345,7 @@ bundlePrices.forEach(item => {
   selectedPrices[item.bundle] = Number(item.price_ghs);
 });
 
-Object.entries(selectedPrices).forEach
+Object.entries(selectedPrices).forEach(([bundle, price]) => {
 
   const card = document.createElement("div");
 
