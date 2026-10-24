@@ -317,30 +317,78 @@ let currentNetwork = "MTN";
 const waNumber = "233530275829";
 
 
+
 async function showNetwork(network, button) {
   currentNetwork = network;
 
-  document.querySelectorAll(".network").forEach(b =>
-    b.classList.remove("active")
-  );
+  document.querySelectorAll(".network").forEach(b => {
+    b.classList.remove("active");
+  });
 
   if (button) button.classList.add("active");
 
   document.getElementById("chosenNetwork").value = network;
 
   const container = document.getElementById("bundles");
+  const select = document.getElementById("chosenBundle");
+
   container.innerHTML = "Loading prices...";
+  select.innerHTML = '<option value="">Choose a bundle</option>';
 
-  const { data: bundlePrices, error } = await supabaseClient
-    .from("bundle_prices")
-    .select("network, bundle, price_ghs")
-    .eq("network", network);
+  try {
+    const { data: bundlePrices, error } = await supabaseClient
+      .from("bundle_prices")
+      .select("network, bundle, price_ghs")
+      .eq("network", network)
+      .order("bundle");
 
-  if (error) {
-    container.innerHTML = "Could not load prices. Please try again.";
-    alert("Could not load prices: " + error.message);
-    return;
+    if (error) throw error;
+
+    if (!bundlePrices || bundlePrices.length === 0) {
+      container.textContent = "No bundle prices found for " + network + ".";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    bundlePrices.forEach(item => {
+      const bundle = item.bundle;
+      const price = Number(item.price_ghs);
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const title = document.createElement("h3");
+      title.textContent = network + " " + bundle;
+
+      const amount = document.createElement("div");
+      amount.className = "price";
+      amount.textContent = "GH₵" + price.toFixed(2);
+
+      const buy = document.createElement("button");
+      buy.textContent = "Buy Now";
+
+      buy.onclick = () => {
+        document.getElementById("chosenNetwork").value = network;
+        select.value = bundle;
+        document.getElementById("checkout").scrollIntoView({
+          behavior: "smooth"
+        });
+      };
+
+      card.append(title, amount, buy);
+      container.appendChild(card);
+
+      const option = document.createElement("option");
+      option.value = bundle;
+      option.textContent = bundle + " - GH₵" + price.toFixed(2);
+      select.appendChild(option);
+    });
+  } catch (error) {
+    container.textContent = "Could not load bundle prices.";
+    alert("Price loading error: " + error.message);
   }
+}
 
   if (!bundlePrices || bundlePrices.length === 0) {
     container.innerHTML = "No bundle prices found for " + network + ".";
