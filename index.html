@@ -617,6 +617,55 @@ document.querySelectorAll('a[href="#manage-prices"]').forEach(function(link) {
 });
 </script>
 <!-- End Manage Prices section -->
+<script>
+async function saveShopPrices() {
+  const client = window.supabaseClient || supabaseClient;
 
+  const products = [
+    { code: "mtn-data", input: "price-mtn" },
+    { code: "telecel-data", input: "price-telecel" },
+    { code: "at-data", input: "price-at" },
+    { code: "wassce-pin", input: "price-wassce" },
+    { code: "bece-pin", input: "price-bece" }
+  ];
+
+  if (!client) {
+    alert("Supabase is not connected.");
+    return;
+  }
+
+  for (const item of products) {
+    const field = document.getElementById(item.input);
+    if (!field || field.value.trim() === "") {
+      alert("Please enter a price in every field.");
+      return;
+    }
+
+    const price = Number(field.value);
+    if (!Number.isFinite(price) || price < 0) {
+      alert("Enter valid prices of zero or more.");
+      return;
+    }
+  }
+
+  for (const item of products) {
+    const price = Number(
+      document.getElementById(item.input).value
+    );
+
+    const { error } = await client
+      .from("products")
+      .update({ price_ghs: price, updated_at: new Date().toISOString() })
+      .eq("product_code", item.code);
+
+    if (error) {
+      alert("Could not save prices: " + error.message);
+      return;
+    }
+  }
+
+  alert("Prices saved successfully!");
+}
+</script>
 </body>
 </html>
