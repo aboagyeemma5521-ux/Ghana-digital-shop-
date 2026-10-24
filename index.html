@@ -619,6 +619,7 @@ document.querySelectorAll('a[href="#manage-prices"]').forEach(function(link) {
 <!-- End Manage Prices section -->
 <script>
 async function saveShopPrices() {
+  alert("Save Prices function is running");
   const client = window.supabaseClient || supabaseClient;
 
   const products = [
