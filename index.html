@@ -390,55 +390,7 @@ async function showNetwork(network, button) {
   }
 }
 
-  if (!bundlePrices || bundlePrices.length === 0) {
-    container.innerHTML = "No bundle prices found for " + network + ".";
-    return;
-  }
-
-  container.innerHTML = "";
-
-  const selectedPrices = {};
-  bundlePrices.forEach(item => {
-    selectedPrices[item.bundle] = Number(item.price_ghs);
-  });
-
-  Object.entries(selectedPrices).forEach(([bundle, price]) => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const title = document.createElement("h3");
-    title.textContent = network + " " + bundle;
-
-    const amount = document.createElement("div");
-    amount.className = "price";
-    amount.textContent = "GH₵" + price.toFixed(2);
-
-    const buy = document.createElement("button");
-    buy.textContent = "Buy Now";
-
-    buy.onclick = () => {
-      document.getElementById("chosenNetwork").value = network;
-      document.getElementById("chosenBundle").value = bundle;
-      document.getElementById("checkout").scrollIntoView({
-        behavior: "smooth"
-      });
-    };
-
-    card.append(title, amount, buy);
-    container.appendChild(card);
-  });
-
-  const select = document.getElementById("chosenBundle");
-  select.innerHTML = '<option value="">Choose a bundle</option>';
-
-  Object.entries(selectedPrices).forEach(([bundle, price]) => {
-    const option = document.createElement("option");
-    option.value = bundle;
-    option.textContent = bundle + " - GH₵" + price.toFixed(2);
-    select.appendChild(option);
-  });
-}
-
+  
 function sendWhatsApp(message){
 
  window.location.href = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
