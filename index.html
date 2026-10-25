@@ -300,7 +300,13 @@ footer{text-align:center;padding:25px;color:#64748b}
 <footer>© 2026 Manuel Data Shop</footer>
 
 <script>
+const SUPABASE_URL = "https://ejbbcyoggohjhegiwgqk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_REAL_KEY_HERE";
 
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 // EDIT THESE EXAMPLE PRICES BEFORE YOU START SELLING.
 
 const prices = {
