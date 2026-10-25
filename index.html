@@ -450,9 +450,13 @@ showNetwork("MTN",document.querySelector(".network"));
   </a>
 </section>
  <script>
-const SUPABASE_URL ="https://ejbbcyoggohjhegiwgqk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP";
-</script>
+const SUPABASE_URL = "https://ejbbcyoggohjhegiwgqk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);</script>
  
 <!-- Manuel Data Shop customer dashboard -->
 <section id="customer-dashboard" style="max-width:600px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px;font-family:Arial,sans-serif;">
