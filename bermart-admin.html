@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bermart Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{background:#10131b;color:white;font-family:Arial;padding:20px}
+main{max-width:700px;margin:30px auto}
+section{background:#1b2130;padding:20px;border-radius:14px;margin:15px 0}
+input,button{width:100%;padding:13px;margin:8px 0;box-sizing:border-box;border-radius:8px}
+input{background:#10131b;color:white;border:1px solid #536078}
+button{background:#5476f5;color:white;border:0;font-weight:bold}
+.hidden{display:none}
+.metric{font-size:25px;font-weight:bold}
+</style>
+</head>
+<body>
+<main>
+<h1>Bermart Admin Dashboard</h1>
+<p>Private shop management</p>
+
+<section id="login">
+<h2>Admin Login</h2>
+<input id="email" type="email" placeholder="Admin email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Sign In</button>
+<p id="message"></p>
+</section>
+
+<section id="dashboard" class="hidden">
+<h2>Welcome, Admin</h2>
+<button onclick="loadOrders()">Refresh Orders</button>
+<button onclick="logout()">Sign Out</button>
+<div class="metric">Total Orders: <span id="total">0</span></div>
+<div class="metric">Paid Sales: GH₵<span id="sales">0.00</span></div>
+<div class="metric">Pending Orders: <span id="pending">0</span></div>
+<h3>Customer Orders</h3>
+<div id="orders">No orders loaded.</div>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL="https://ejbbcyoggohjhegiwgqk.supabase.co";
+const SUPABASE_KEY="PASTE_YOUR_EXISTING_PUBLISHABLE_KEY_HERE";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function login(){
+ const {error}=await db.auth.signInWithPassword({
+  email:document.getElementById("email").value.trim(),
+  password:document.getElementById("password").value
+ });
+ if(error){document.getElementById("message").textContent=error.message;return;}
+ await checkAdmin();
+}
+
+async function checkAdmin(){
+ const {data:{user}}=await db.auth.getUser();
+ if(!user)return;
+ const {data:profile,error}=await db.from("profiles")
+  .select("role").eq("id",user.id).single();
+ if(error||profile.role!=="admin"){
+  await db.auth.signOut();
+  document.getElementById("message").textContent="Admin access only.";
+  return;
+ }
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+ await loadOrders();
+}
+
+async function loadOrders(){
+ const {data,error}=await db.from("shop_orders")
+  .select("id,created_at,customer_name,customer_phone,product_name,amount_ghs,order_status,payment_status")
+  .order("created_at",{ascending:false});
+ if(error){document.getElementById("orders").textContent=error.message;return;}
+ document.getElementById("total").textContent=data.length;
+ document.getElementById("sales").textContent=data
+  .filter(o=>o.payment_status==="paid")
+  .reduce((sum,o)=>sum+Number(o.amount_ghs),0).toFixed(2);
+ document.getElementById("pending").textContent=data
+  .filter(o=>o.order_status==="pending").length;
+ document.getElementById("orders").innerHTML="";
+ data.forEach(o=>{
+  const item=document.createElement("section");
+  item.textContent=`Order #${o.id} | ${o.customer_name} | ${o.customer_phone} | ${o.product_name} | GH₵${Number(o.amount_ghs).toFixed(2)} | ${o.order_status} | ${o.payment_status}`;
+  document.getElementById("orders").appendChild(item);
+ });
+}
+
+async function logout(){
+ await db.auth.signOut();
+ location.reload();
+}
+
+checkAdmin();
+</script>
+</body>
+</html>
