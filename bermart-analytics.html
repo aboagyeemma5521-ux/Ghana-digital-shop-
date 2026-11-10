@@ -1,1 +1,190 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bermart Business Analytics</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{background:#10131b;color:white;font-family:Arial;padding:16px}
+main{max-width:850px;margin:25px auto}
+section{background:#1b2130;padding:18px;border-radius:12px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.metric{font-size:25px;font-weight:bold;color:#8ca5ff}
+small{color:#aab4c8}
+input,button{width:100%;padding:13px;margin:8px 0;box-sizing:border-box;border-radius:8px}
+input{background:#10131b;color:white;border:1px solid #536078}
+button{background:#5476f5;color:white;border:0;font-weight:bold}
+.hidden{display:none}
+.order{border-bottom:1px solid #536078;padding:12px 0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1>Bermart Business Analytics</h1>
+<p>Private business performance dashboard</p>
+
+<section id="login">
+<h2>Admin Login</h2>
+<input id="email" type="email" placeholder="Admin email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Sign In</button>
+<p id="message"></p>
+</section>
+
+<div id="dashboard" class="hidden">
+<button onclick="loadAnalytics()">Refresh Analytics</button>
+<button onclick="logout()">Sign Out</button>
+
+<div class="grid">
+<section>
+<small>Today's Paid Sales</small>
+<div class="metric">GH₵<span id="daily">0.00</span></div>
+</section>
+<section>
+<small>This Month's Paid Sales</small>
+<div class="metric">GH₵<span id="monthly">0.00</span></div>
+</section>
+<section>
+<small>Total Customers</small>
+<div class="metric" id="customers">0</div>
+</section>
+<section>
+<small>Total Orders</small>
+<div class="metric" id="ordersCount">0</div>
+</section>
+<section>
+<small>Paid Orders</small>
+<div class="metric" id="paid">0</div>
+</section>
+<section>
+<small>Pending Orders</small>
+<div class="metric" id="pending">0</div>
+</section>
+</div>
+
+<section>
+<h2>Best-selling Network</h2>
+<div class="metric" id="bestNetwork">Not available yet</div>
+</section>
+
+<section>
+<h2>Recent Orders</h2>
+<div id="recent">No orders loaded.</div>
+</section>
+</div>
+</main>
+
+<script>
+const SUPABASE_URL="https://ejbbcyoggohjhegiwgqk.supabase.co";
+const SUPABASE_KEY="sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function login(){
+ const {error}=await db.auth.signInWithPassword({
+  email:document.getElementById("email").value.trim(),
+  password:document.getElementById("password").value
+ });
+ if(error){
+  document.getElementById("message").textContent=error.message;
+  return;
+ }
+ await checkAdmin();
+}
+
+async function checkAdmin(){
+ const {data:{user}}=await db.auth.getUser();
+ if(!user)return;
+
+ const {data:profile,error}=await db.from("profiles")
+  .select("role").eq("id",user.id).single();
+
+ if(error||profile.role!=="admin"){
+  await db.auth.signOut();
+  document.getElementById("message").textContent="Admin access only.";
+  return;
+ }
+
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+ await loadAnalytics();
+}
+
+async function loadAnalytics(){
+ const {data,error}=await db.from("shop_orders")
+  .select("id,created_at,customer_name,customer_phone,product_name,amount_ghs,order_status,payment_status")
+  .order("created_at",{ascending:false});
+
+ if(error){
+  document.getElementById("recent").textContent=error.message;
+  return;
+ }
+
+ const now=new Date();
+ const today=now.toDateString();
+ const month=now.getMonth();
+ const year=now.getFullYear();
+
+ const paidOrders=data.filter(o=>o.payment_status==="paid");
+
+ const dailySales=paidOrders.filter(o=>
+  new Date(o.created_at).toDateString()===today
+ );
+
+ const monthlySales=paidOrders.filter(o=>{
+  const d=new Date(o.created_at);
+  return d.getMonth()===month && d.getFullYear()===year;
+ });
+
+ const total=arr=>arr.reduce((sum,o)=>
+  sum+Number(o.amount_ghs||0),0);
+
+ document.getElementById("daily").textContent=total(dailySales).toFixed(2);
+ document.getElementById("monthly").textContent=total(monthlySales).toFixed(2);
+ document.getElementById("customers").textContent=
+  new Set(data.map(o=>o.customer_phone).filter(Boolean)).size;
+ document.getElementById("ordersCount").textContent=data.length;
+ document.getElementById("paid").textContent=paidOrders.length;
+ document.getElementById("pending").textContent=
+  data.filter(o=>o.order_status==="pending").length;
+
+ const networks={MTN:0,Telecel:0,AT:0};
+
+ paidOrders.forEach(o=>{
+  const product=(o.product_name||"").toLowerCase();
+  if(product.includes("mtn"))networks.MTN++;
+  else if(product.includes("telecel"))networks.Telecel++;
+  else if(product.includes("at"))networks.AT++;
+ });
+
+ const best=Object.entries(networks).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById("bestNetwork").textContent=
+  best && best[1]>0 ? best[0]+" ("+best[1]+" paid orders)" : "Not available yet";
+
+ const recent=document.getElementById("recent");
+ recent.innerHTML="";
+
+ data.slice(0,10).forEach(o=>{
+  const item=document.createElement("div");
+  item.className="order";
+  item.textContent="Order #"+o.id+" | "+(o.customer_name||"Customer")+
+   " | "+(o.product_name||"Product")+
+   " | GH₵"+Number(o.amount_ghs||0).toFixed(2)+
+   " | "+(o.payment_status||"Unknown");
+  recent.appendChild(item);
+ });
+
+ if(data.length===0)recent.textContent="No orders found.";
+}
+
+async function logout(){
+ await db.auth.signOut();
+ location.reload();
+}
+
+checkAdmin();
+</script>
+</body>
+</html>
+
