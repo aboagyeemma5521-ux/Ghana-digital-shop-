@@ -37,6 +37,8 @@ button{background:#5476f5;color:white;border:0;font-weight:bold}
 <div class="metric">Total Orders: <span id="total">0</span></div>
 <div class="metric">Paid Sales: GH₵<span id="sales">0.00</span></div>
 <div class="metric">Pending Orders: <span id="pending">0</span></div>
+ <div class="metric">Total Customers: <span id="customers">0</span></div>
+<div class="metric">Completed Orders: <span id="completed">0</span></div>
 <h3>Customer Orders</h3>
 <div id="orders">No orders loaded.</div>
 </section>
@@ -96,6 +98,11 @@ async function loadOrders(){
   .reduce((sum,o)=>sum+Number(o.amount_ghs),0).toFixed(2);
  document.getElementById("pending").textContent=data
   .filter(o=>o.order_status==="pending").length;
+ document.getElementById("completed").textContent=data
+  .filter(o=>o.order_status==="completed").length;
+
+document.getElementById("customers").textContent=
+  new Set(data.map(o=>o.customer_phone).filter(Boolean)).size;
  document.getElementById("orders").innerHTML="";
  data.forEach(o=>{
   const item=document.createElement("section");
