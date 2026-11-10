@@ -26,6 +26,7 @@ button{background:#5476f5;color:white;border:0;font-weight:bold}
 <input id="email" type="email" placeholder="Admin email">
 <input id="password" type="password" placeholder="Password">
 <button onclick="login()">Sign In</button>
+ <button onclick="sendPasswordReset()">Forgot Password?</button>
 <p id="message"></p>
 </section>
 
@@ -54,7 +55,21 @@ async function login(){
  if(error){document.getElementById("message").textContent=error.message;return;}
  await checkAdmin();
 }
+async function sendPasswordReset(){
+ const email=document.getElementById("email").value.trim();
 
+ if(!email){
+  document.getElementById("message").textContent="Enter your admin email first.";
+  return;
+ }
+
+ const {error}=await db.auth.resetPasswordForEmail(email,{
+  redirectTo:"https://aboagyeemma5521-ux.github.io/Ghana-digital-shop-/reset-password.html"
+ });
+
+ document.getElementById("message").textContent=
+ error ? error.message : "Password reset email sent. Check your inbox.";
+}
 async function checkAdmin(){
  const {data:{user}}=await db.auth.getUser();
  if(!user)return;
