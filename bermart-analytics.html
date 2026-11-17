@@ -245,17 +245,18 @@ function renderOrders(){
    item.appendChild(paidBtn);
   }
 
-  if(o.order_status!=="completed"){
+   if(o.order_status!=="completed"){
    const completeBtn=document.createElement("button");
    completeBtn.textContent="Mark as Completed";
    completeBtn.onclick=()=>updateOrder(o.id,{order_status:"completed"});
    item.appendChild(completeBtn);
-   const deleteBtn=document.createElement("button");
-deleteBtn.textContent="Delete Order";
-deleteBtn.style.background="#dc3545";
-deleteBtn.onclick=()=>deleteOrder(o.id);
-item.appendChild(deleteBtn);
   }
+
+  const deleteBtn=document.createElement("button");
+  deleteBtn.textContent="Delete Order";
+  deleteBtn.style.background="#dc3545";
+  deleteBtn.onclick=()=>deleteOrder(o.id);
+  item.appendChild(deleteBtn);
 
   recent.appendChild(item);
  });
