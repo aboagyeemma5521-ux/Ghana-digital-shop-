@@ -70,7 +70,28 @@ button{background:#5476f5;color:white;border:0;font-weight:bold}
 </section>
 
 <section>
-<h2>Recent Orders</h2>
+<h2>Sales & Orders Management</h2>
+
+<input id="orderSearch" type="search"
+placeholder="Search customer, phone or product"
+oninput="renderOrders()">
+
+<label>Payment Status</label>
+<select id="paymentFilter" onchange="renderOrders()">
+<option value="all">All Payments</option>
+<option value="paid">Paid</option>
+<option value="pending">Pending</option>
+<option value="unpaid">Unpaid</option>
+</select>
+
+<label>Order Status</label>
+<select id="statusFilter" onchange="renderOrders()">
+<option value="all">All Orders</option>
+<option value="pending">Pending</option>
+<option value="completed">Completed</option>
+</select>
+
+<p id="orderSummary">Loading orders...</p>
 <div id="recent">No orders loaded.</div>
 </section>
 </div>
@@ -110,7 +131,7 @@ async function checkAdmin(){
  document.getElementById("dashboard").classList.remove("hidden");
  await loadAnalytics();
 }
-
+let allOrders = [];
 async function loadAnalytics(){
  const {data,error}=await db.from("shop_orders")
   .select("id,created_at,customer_name,customer_phone,product_name,amount_ghs,order_status,payment_status")
@@ -120,7 +141,7 @@ async function loadAnalytics(){
   document.getElementById("recent").textContent=error.message;
   return;
  }
-
+allOrders = data;
  const now=new Date();
  const today=now.toDateString();
  const month=now.getMonth();
@@ -162,22 +183,71 @@ async function loadAnalytics(){
  document.getElementById("bestNetwork").textContent=
   best && best[1]>0 ? best[0]+" ("+best[1]+" paid orders)" : "Not available yet";
 
+ renderOrders();
+}
+function renderOrders(){
+
+ const search=document.getElementById("orderSearch").value.toLowerCase();
+ const payment=document.getElementById("paymentFilter").value;
+ const status=document.getElementById("statusFilter").value;
+
  const recent=document.getElementById("recent");
  recent.innerHTML="";
 
- data.slice(0,10).forEach(o=>{
-  const item=document.createElement("div");
-  item.className="order";
-  item.textContent="Order #"+o.id+" | "+(o.customer_name||"Customer")+
-   " | "+(o.product_name||"Product")+
-   " | GH₵"+Number(o.amount_ghs||0).toFixed(2)+
-   " | "+(o.payment_status||"Unknown");
-  recent.appendChild(item);
+ const filtered=allOrders.filter(o=>{
+
+  const paymentStatus=(o.payment_status||"").toLowerCase();
+  const orderStatus=(o.order_status||"").toLowerCase();
+
+  const matchesSearch=[
+   o.customer_name,
+   o.customer_phone,
+   o.product_name,
+   o.id
+  ].some(value=>String(value||"").toLowerCase().includes(search));
+
+  const matchesPayment=
+   payment==="all" ||
+   paymentStatus===payment;
+
+  const matchesStatus=
+   status==="all" ||
+   orderStatus===status;
+
+  return matchesSearch && matchesPayment && matchesStatus;
  });
 
- if(data.length===0)recent.textContent="No orders found.";
-}
+ document.getElementById("orderSummary").textContent=
+  filtered.length+" orders found";
 
+ if(filtered.length===0){
+  recent.textContent="No matching orders found.";
+  return;
+ }
+
+ filtered.forEach(o=>{
+
+  const item=document.createElement("div");
+  item.className="order";
+
+  const details=document.createElement("p");
+
+  details.textContent=
+   "Order #"+o.id+
+   "\nCustomer: "+(o.customer_name||"Not provided")+
+   "\nPhone: "+(o.customer_phone||"Not provided")+
+   "\nProduct: "+(o.product_name||"Not provided")+
+   "\nAmount: GH₵"+Number(o.amount_ghs||0).toFixed(2)+
+   "\nPayment: "+(o.payment_status||"Unknown")+
+   "\nOrder Status: "+(o.order_status||"Unknown")+
+   "\nDate: "+new Date(o.created_at).toLocaleString();
+
+  details.style.whiteSpace="pre-line";
+  item.appendChild(details);
+  recent.appendChild(item);
+
+ });
+}
 async function logout(){
  await db.auth.signOut();
  location.reload();
