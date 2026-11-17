@@ -74,6 +74,33 @@ button{
 </div>
 
 <section>
+ <section>
+<h2>Profit & Expenses</h2>
+
+<div class="grid">
+ <section>
+  <small>Total Product Costs</small>
+  <div class="metric" id="totalCosts">GH₵0.00</div>
+ </section>
+
+ <section>
+  <small>Total Expenses</small>
+  <div class="metric" id="totalExpenses">GH₵0.00</div>
+ </section>
+
+ <section>
+  <small>Net Profit</small>
+  <div class="metric" id="netProfit">GH₵0.00</div>
+ </section>
+</div>
+
+<h3>Add Business Expense</h3>
+<input id="expenseDescription" placeholder="Expense description">
+<input id="expenseAmount" type="number" min="0.01" step="0.01" placeholder="Amount in GH₵">
+<button onclick="addExpense()">Save Expense</button>
+
+<p id="expenseMessage"></p>
+</section>
 <h2>Best-selling Network</h2>
 <div class="metric" id="bestNetwork">Not available yet</div>
 </section>
@@ -143,7 +170,7 @@ async function checkAdmin(){
 let allOrders = [];
 async function loadAnalytics(){
  const {data,error}=await db.from("shop_orders")
-  .select("id,created_at,customer_name,customer_phone,product_name,amount_ghs,order_status,payment_status")
+  .select("id,created_at,customer_name,customer_phone,product_name,amount_ghs,cost_ghs,order_status,payment_status")
   .order("created_at",{ascending:false});
 
  if(error){
@@ -193,6 +220,7 @@ allOrders = data;
   best && best[1]>0 ? best[0]+" ("+best[1]+" paid orders)" : "Not available yet";
 
  renderOrders();
+ await loadProfit();
 }
 
 function renderOrders(){
@@ -291,6 +319,64 @@ async function updateOrder(id,changes){
 
  alert("Order deleted successfully!");
  await loadAnalytics();
+}
+ async function loadProfit(){
+ const {data:orders,error:orderError}=await db
+  .from("shop_orders")
+  .select("amount_ghs,cost_ghs,payment_status");
+
+ if(orderError){
+  alert("Could not load product costs: "+orderError.message);
+  return;
+ }
+
+ const {data:expenses,error:expenseError}=await db
+  .from("shop_expenses")
+  .select("amount_ghs");
+
+ if(expenseError){
+  alert("Could not load expenses: "+expenseError.message);
+  return;
+ }
+
+ const paid=orders.filter(o=>
+  (o.payment_status||"").toLowerCase()==="paid"
+ );
+
+ const sales=paid.reduce((s,o)=>s+Number(o.amount_ghs||0),0);
+ const costs=paid.reduce((s,o)=>s+Number(o.cost_ghs||0),0);
+ const totalExpenses=expenses.reduce((s,e)=>s+Number(e.amount_ghs||0),0);
+
+ document.getElementById("totalCosts").textContent="GH₵"+costs.toFixed(2);
+ document.getElementById("totalExpenses").textContent="GH₵"+totalExpenses.toFixed(2);
+ document.getElementById("netProfit").textContent=
+  "GH₵"+(sales-costs-totalExpenses).toFixed(2);
+}
+
+async function addExpense(){
+ const description=document.getElementById("expenseDescription").value.trim();
+ const amount=Number(document.getElementById("expenseAmount").value);
+
+ if(!description||!Number.isFinite(amount)||amount<=0){
+  alert("Enter a valid description and amount.");
+  return;
+ }
+
+ const {error}=await db.from("shop_expenses").insert({
+  description:description,
+  amount_ghs:amount
+ });
+
+ if(error){
+  alert("Could not save expense: "+error.message);
+  return;
+ }
+
+ document.getElementById("expenseDescription").value="";
+ document.getElementById("expenseAmount").value="";
+
+ alert("Expense saved successfully!");
+ await loadProfit();
 }
 async function logout(){
  await db.auth.signOut();
