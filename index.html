@@ -476,12 +476,34 @@ const supabaseClient = window.supabase.createClient(
     <input id="customer-password" type="password" minlength="6" required
       style="display:block;width:100%;padding:12px;margin:8px 0 16px;box-sizing:border-box;">
 
-    <button type="button" id="customer-signup">Create account</button>
-    <button type="submit">Log in</button>
-    <button type="button" id="customer-logout" hidden>Log out</button>
+   <button type="button" id="customer-signup">Create account</button>
+
+<button type="submit">Log in</button>
+
+<button type="button" id="forgot-password">
+  Forgot Password?
+</button>
+
+<button type="button" id="customer-logout" hidden>
+  Log out
+</button>
   </form>
 
   <p id="customer-auth-message" role="status"></p>
+  <div id="password-reset-box" hidden>
+  <h3>Create New Password</h3>
+
+  <input
+    id="new-password"
+    type="password"
+    minlength="6"
+    placeholder="Enter your new password"
+  >
+
+  <button type="button" id="save-new-password">
+    Save New Password
+  </button>
+</div>
   <div id="customer-orders" hidden>
     <h3>Your orders</h3>
     <p id="customer-orders-message">Sign in to load your orders.</p>
@@ -495,7 +517,56 @@ const supabaseClient = window.supabase.createClient(
 const emailInput = document.getElementById("customer-email");
 const passwordInput = document.getElementById("customer-password");
 const message = document.getElementById("customer-auth-message");
+// Request password reset
+document.getElementById("forgot-password").onclick = async () => {
+  const email = emailInput.value.trim();
 
+  if (!email) {
+    message.textContent = "Enter your email address first.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(
+    email,
+    {
+      redirectTo: window.location.origin + window.location.pathname
+    }
+  );
+
+  message.textContent = error
+    ? error.message
+    : "Password reset email sent. Check your inbox.";
+};
+
+// Show password form when recovery link is accepted
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    document.getElementById("password-reset-box").hidden = false;
+    message.textContent = "Enter your new password.";
+  }
+});
+
+// Save new password
+document.getElementById("save-new-password").onclick = async () => {
+  const newPassword = document.getElementById("new-password").value;
+
+  if (newPassword.length < 6) {
+    message.textContent = "Password must be at least 6 characters.";
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: newPassword
+  });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  message.textContent = "Password updated successfully!";
+  document.getElementById("password-reset-box").hidden = true;
+};
 document.getElementById("customer-signup").onclick = async () => {
   const { error } = await supabaseClient.auth.signUp({
     email: emailInput.value.trim(),
