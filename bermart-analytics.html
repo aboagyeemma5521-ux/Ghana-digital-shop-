@@ -263,7 +263,29 @@ function renderOrders(){
 
   details.style.whiteSpace="pre-line";
   item.appendChild(details);
+const costLabel=document.createElement("label");
+costLabel.textContent="Product Cost (GH₵):";
 
+const costInput=document.createElement("input");
+costInput.type="number";
+costInput.min="0";
+costInput.step="0.01";
+costInput.value=Number(o.cost_ghs||0);
+
+const saveCostBtn=document.createElement("button");
+saveCostBtn.textContent="Save Product Cost";
+saveCostBtn.onclick=()=>{
+ const cost=Number(costInput.value);
+ if(!Number.isFinite(cost)||cost<0){
+  alert("Enter a valid product cost.");
+  return;
+ }
+ updateOrder(o.id,{cost_ghs:cost});
+};
+
+item.appendChild(costLabel);
+item.appendChild(costInput);
+item.appendChild(saveCostBtn);
   if(o.payment_status!=="paid"){
    const paidBtn=document.createElement("button");
    paidBtn.textContent="Mark as Paid";
