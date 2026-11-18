@@ -424,7 +424,64 @@ function dataOrder(event){
 
 }
 
-function pinOrder(event,exam){
+async function dataOrder(event) {
+  event.preventDefault();
+
+  const network = document.getElementById("chosenNetwork").value;
+  const bundle = document.getElementById("chosenBundle").value;
+  const phone = document.getElementById("customerPhone").value.trim();
+
+  if (!bundle || !phone) {
+    alert("Please select a bundle and enter your phone number.");
+    return;
+  }
+
+  const button = event.submitter;
+  if (button) button.disabled = true;
+
+  try {
+    const { data: priceRow, error: priceError } = await supabaseClient
+      .from("bundle_prices")
+      .select("price_ghs")
+      .eq("network", network)
+      .eq("bundle", bundle)
+      .single();
+
+    if (priceError || !priceRow) {
+      throw new Error("Could not find the current bundle price.");
+    }
+
+    const { data, error } = await supabaseClient
+      .from("shop_orders")
+      .insert({
+        customer_name: "Customer",
+        customer_phone: phone,
+        product_type: "data",
+        network: network,
+        product_name: network + " " + bundle,
+        amount_ghs: Number(priceRow.price_ghs),
+        order_status: "pending",
+        payment_status: "pending",
+        quantity: 1
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+
+    alert(
+      "Your order was submitted successfully!\n\n" +
+      "Order ID: " + data.id +
+      "\nAmount: GH₵" + Number(priceRow.price_ghs).toFixed(2) +
+      "\nPayment status: Pending"
+    );
+
+  } catch (error) {
+    alert("Order could not be submitted: " + error.message);
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
 
  event.preventDefault();
 
@@ -492,7 +549,7 @@ async function trackMyOrder() {
 
   result.style.whiteSpace = "pre-line";
 }
- 
+ </script>
 <!-- Bermart Data Shop customer dashboard -->
 <section id="customer-dashboard" style="max-width:600px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px;font-family:Arial,sans-serif;">
   <h2>Bermart Data Shop</h2>
