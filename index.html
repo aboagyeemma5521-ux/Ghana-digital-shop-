@@ -414,7 +414,7 @@ function dataOrder(event){
 
  const price = prices[network][bundle];
 
- sendWhatsApp("MANUEL DATA SHOP - DATA ORDER\nNetwork: "+network+
+ sendWhatsApp("BERMART DATA SHOP - DATA ORDER\nNetwork: "+network+
 
  "\nBundle: "+bundle+"\nRecipient phone: "+phone+
 
@@ -434,7 +434,7 @@ function pinOrder(event,exam){
 
  const qty = document.getElementById(prefix+"qty").value;
 
- sendWhatsApp("MANUEL DATA SHOP - "+exam+" PIN ORDER\nQuantity: "+qty+
+ sendWhatsApp("BERMART DATA SHOP - "+exam+" PIN ORDER\nQuantity: "+qty+
 
  "\nCustomer phone: "+phone+"\nPlease confirm PIN availability, price and payment.");
 
@@ -457,6 +457,41 @@ const SUPABASE_URL = "https://ejbbcyoggohjhegiwgqk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP";
 
 const supabaseClient = window.supabase.createClient(
+  async function trackMyOrder() {
+  const orderId = document.getElementById("trackingOrderId").value.trim();
+  const phone = document.getElementById("trackingPhone").value.trim();
+  const result = document.getElementById("trackingResult");
+
+  if (!orderId || !phone) {
+    result.textContent = "Please enter your Order ID and phone number.";
+    return;
+  }
+
+  result.textContent = "Checking your order...";
+
+  const { data, error } = await db.rpc("track_shop_order", {
+    p_order_id: orderId,
+    p_phone: phone
+  });
+
+  if (error) {
+    result.textContent = "Unable to check your order. Please try again.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    result.textContent = "Order not found. Check your Order ID and phone number.";
+    return;
+  }
+
+  const order = data[0];
+
+  result.textContent =
+    "Product: " + order.product_name +
+    "\nOrder Status: " + order.order_status +
+    "\nPayment Status: " + order.payment_status;
+  result.style.whiteSpace = "pre-line";
+}
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );</script>
@@ -796,7 +831,12 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
     placeholder="Enter Order ID"
     style="width:100%;padding:12px;margin-bottom:12px;"
   >
-
+<input
+  id="trackingPhone"
+  type="tel"
+  placeholder="Enter your order phone number"
+  style="width:100%;padding:12px;margin-bottom:12px;"
+>
   <button onclick="trackMyOrder()" style="padding:12px;width:100%;">
     Track Order
   </button>
