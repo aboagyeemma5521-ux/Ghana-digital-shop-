@@ -234,153 +234,6 @@ allOrders = data;
 
  renderOrders();
 renderCustomers();
-await loadProfit();
-}
-
-function renderOrders(){
- const search=document.getElementById("orderSearch").value.toLowerCase();
- const payment=document.getElementById("paymentFilter").value;
- const status=document.getElementById("statusFilter").value;
- const recent=document.getElementById("recent");
-
- recent.innerHTML="";
-
- const filtered=allOrders.filter(o=>{
-  const matchesSearch=[
-   o.customer_name,o.customer_phone,o.product_name,o.id
-  ].some(v=>String(v||"").toLowerCase().includes(search));
-
-  return matchesSearch &&
-   (payment==="all" || (o.payment_status||"").toLowerCase()===payment) &&
-   (status==="all" || (o.order_status||"").toLowerCase()===status);
- });
-
- document.getElementById("orderSummary").textContent=
-  filtered.length+" orders found";
-
- if(filtered.length===0){
-  recent.textContent="No matching orders found.";
-  return;
- }
-
- filtered.forEach(o=>{
-  const item=document.createElement("div");
-  item.className="order";
-
-  const details=document.createElement("p");
-  details.textContent=
-   "Order #"+o.id+
-   "\nCustomer: "+(o.customer_name||"Not provided")+
-   "\nPhone: "+(o.customer_phone||"Not provided")+
-   "\nProduct: "+(o.product_name||"Not provided")+
-   "\nAmount: GH₵"+Number(o.amount_ghs||0).toFixed(2)+
-   "\nPayment: "+(o.payment_status||"Unknown")+
-   "\nOrder Status: "+(o.order_status||"Unknown");
-
-  details.style.whiteSpace="pre-line";
-  item.appendChild(details);
-const costLabel=document.createElement("label");
-costLabel.textContent="Product Cost (GH₵):";
-
-const costInput=document.createElement("input");
-costInput.type="number";
-costInput.min="0";
-costInput.step="0.01";
-costInput.value=Number(o.cost_ghs||0);
-
-const saveCostBtn=document.createElement("button");
-saveCostBtn.textContent="Save Product Cost";
-saveCostBtn.onclick=()=>{
- const cost=Number(costInput.value);
- if(!Number.isFinite(cost)||cost<0){
-  alert("Enter a valid product cost.");
-  return;
- }
- updateOrder(o.id,{cost_ghs:cost});
-};
-
-item.appendChild(costLabel);
-item.appendChild(costInput);
-item.appendChild(saveCostBtn);
-  if(o.payment_status!=="paid"){
-   const paidBtn=document.createElement("button");
-   paidBtn.textContent="Mark as Paid";
-   paidBtn.onclick=()=>updateOrder(o.id,{payment_status:"paid"});
-   item.appendChild(paidBtn);
-  }
-
-   if(o.order_status!=="completed"){
-   const completeBtn=document.createElement("button");
-   completeBtn.textContent="Mark as Completed";
-   completeBtn.onclick=()=>updateOrder(o.id,{order_status:"completed"});
-   item.appendChild(completeBtn);
-  }
-
-  const deleteBtn=document.createElement("button");
-  deleteBtn.textContent="Delete Order";
-  deleteBtn.style.background="#dc3545";
-  deleteBtn.onclick=()=>deleteOrder(o.id);
-  item.appendChild(deleteBtn);
-
-  recent.appendChild(item);
- });
-}
-function renderCustomers(){
- const search=document.getElementById("customerSearch").value.toLowerCase();
- const customerList=document.getElementById("customerList");
- const customers={};
-
- allOrders.forEach(order=>{
-  const phone=order.customer_phone||"No phone";
-  const name=order.customer_name||"Unknown";
-
-  if(!customers[phone]){
-   customers[phone]={
-    name:name,
-    phone:phone,
-    orders:0,
-    spent:0
-   };
-  }
-
-  customers[phone].orders++;
-
-  if((order.payment_status||"").toLowerCase()==="paid"){
-   customers[phone].spent+=Number(order.amount_ghs||0);
-  }
- });
-
- const filtered=Object.values(customers).filter(customer=>
-  customer.name.toLowerCase().includes(search)||
-  customer.phone.toLowerCase().includes(search)
- );
-
- document.getElementById("customerCount").textContent=
-  Object.keys(customers).length;
-
- customerList.innerHTML="";
-
- if(filtered.length===0){
-  customerList.textContent="No customers found.";
-  return;
- }
-
- filtered.forEach(customer=>{
-  const card=document.createElement("div");
-  card.className="order";
-
-  card.textContent=
-   "Customer: "+customer.name+
-   "\nPhone: "+customer.phone+
-   "\nOrders: "+customer.orders+
-   "\nTotal Spent: GH₵"+customer.spent.toFixed(2);
-
-  card.style.whiteSpace="pre-line";
-  customerList.appendChild(card);
- });
-}
- renderOrders();
-renderCustomers();
 renderTopCustomers();
 await loadProfit();
 }
@@ -527,6 +380,49 @@ function renderCustomers(){
   customerList.appendChild(card);
  });
 }
+ function renderTopCustomers(){
+ const top=document.getElementById("topCustomers");
+ const customers={};
+
+ allOrders.forEach(order=>{
+  if((order.payment_status||"").toLowerCase()!=="paid")return;
+
+  const phone=order.customer_phone||"No phone";
+
+  if(!customers[phone]){
+   customers[phone]={
+    name:order.customer_name||"Unknown",
+    phone:phone,
+    spent:0
+   };
+  }
+
+  customers[phone].spent+=Number(order.amount_ghs||0);
+ });
+
+ const ranked=Object.values(customers)
+  .sort((a,b)=>b.spent-a.spent)
+  .slice(0,5);
+
+ top.innerHTML="";
+
+ if(ranked.length===0){
+  top.textContent="No customer purchases yet.";
+  return;
+ }
+
+ ranked.forEach((customer,index)=>{
+  const card=document.createElement("div");
+  card.className="order";
+  card.textContent=
+   (index+1)+". "+customer.name+
+   "\nPhone: "+customer.phone+
+   "\nTotal Paid: GH₵"+customer.spent.toFixed(2);
+
+  card.style.whiteSpace="pre-line";
+  top.appendChild(card);
+ });
+}
 async function updateOrder(id,changes){
  if(!confirm("Are you sure you want to update this order?"))return;
 
@@ -557,54 +453,7 @@ async function updateOrder(id,changes){
  alert("Order deleted successfully!");
  await loadAnalytics();
 }
- async function loadProfit(){
- const {data:orders,error:orderError}=await db
-  .from("shop_orders")
-  .select("amount_ghs,cost_ghs,payment_status");
-
- if(orderError){
-  alert("Could not load product costs: "+orderError.message);
-  return;
- }
-
- const {data:expenses,error:expenseError}=await db
-  .from("shop_expenses")
-  .select("amount_ghs");
-
- if(expenseError){
-  alert("Could not load expenses: "+expenseError.message);
-  return;
- }
-async function updateOrder(id,changes){
- if(!confirm("Are you sure you want to update this order?"))return;
-
- const {error}=await db.from("shop_orders")
-  .update(changes)
-  .eq("id",id);
-
- if(error){
-  alert("Update failed: "+error.message);
-  return;
- }
-
- alert("Order updated successfully!");
- await loadAnalytics();
-}
- async function deleteOrder(id){
- if(!confirm("Are you sure you want to permanently delete this order?"))return;
-
- const {error}=await db.from("shop_orders")
-  .delete()
-  .eq("id",id);
-
- if(error){
-  alert("Delete failed: "+error.message);
-  return;
- }
-
- alert("Order deleted successfully!");
- await loadAnalytics();
-}
+ 
  async function loadProfit(){
  const {data:orders,error:orderError}=await db
   .from("shop_orders")
