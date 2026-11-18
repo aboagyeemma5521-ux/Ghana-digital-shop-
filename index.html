@@ -458,18 +458,55 @@ async function dataOrder(event) {
   }
 }
 
-function pinOrder(event, exam) {
+async function pinOrder(event, exam) {
   event.preventDefault();
 
   const prefix = exam === "WASSCE" ? "w" : "b";
   const phone = document.getElementById(prefix + "phone").value.trim();
-  const qty = document.getElementById(prefix + "qty").value;
+  const qty = Number(document.getElementById(prefix + "qty").value);
 
-  sendWhatsApp(
-    "BERMART DATA SHOP - " + exam +
-    " PIN ORDER\nQuantity: " + qty +
-    "\nCustomer phone: " + phone
-  );
+  if (!phone || !Number.isInteger(qty) || qty < 1) {
+    alert("Please enter a valid phone number and quantity.");
+    return;
+  }
+
+  const button = event.submitter;
+  if (button) button.disabled = true;
+
+  try {
+    const price = 30;
+    const total = price * qty;
+
+    const { data, error } = await supabaseClient
+      .from("shop_orders")
+      .insert({
+        customer_name: "Customer",
+        customer_phone: phone,
+        product_type: "exam_pin",
+        product_name: exam + " Checker PIN",
+        amount_ghs: total,
+        order_status: "pending",
+        payment_status: "pending",
+        quantity: qty
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+
+    alert(
+      exam + " order submitted successfully!\n" +
+      "Order ID: " + data.id +
+      "\nQuantity: " + qty +
+      "\nTotal: GH₵" + total.toFixed(2) +
+      "\nPayment status: Pending"
+    );
+
+  } catch (error) {
+    alert("PIN order error: " + error.message);
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 showNetwork("MTN",document.querySelector(".network"));
 
