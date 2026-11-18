@@ -152,6 +152,7 @@ const SUPABASE_KEY="sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 async function login(){
+ alert("Login button is working");
  const {error}=await db.auth.signInWithPassword({
   email:document.getElementById("email").value.trim(),
   password:document.getElementById("password").value
