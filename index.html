@@ -453,34 +453,33 @@ showNetwork("MTN",document.querySelector(".network"));
   </a>
 </section>
  <script>
-const SUPABASE_URL = "https://ejbbcyoggohjhegiwgqk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_1K0d4Z4Z6JRh9sYkQqSjGg_3prYnHpP";
-
-const supabaseClient = window.supabase.createClient(
-  async function trackMyOrder() {
+async function trackMyOrder() {
   const orderId = document.getElementById("trackingOrderId").value.trim();
   const phone = document.getElementById("trackingPhone").value.trim();
   const result = document.getElementById("trackingResult");
 
   if (!orderId || !phone) {
-    result.textContent = "Please enter your Order ID and phone number.";
+    result.textContent = "Enter your Order ID and phone number.";
     return;
   }
 
   result.textContent = "Checking your order...";
 
-  const { data, error } = await db.rpc("track_shop_order", {
-    p_order_id: orderId,
-    p_phone: phone
-  });
+  const { data, error } = await supabaseClient.rpc(
+    "track_shop_order",
+    {
+      p_order_id: orderId,
+      p_phone: phone
+    }
+  );
 
   if (error) {
-    result.textContent = "Unable to check your order. Please try again.";
+    result.textContent = "Unable to check your order.";
     return;
   }
 
   if (!data || data.length === 0) {
-    result.textContent = "Order not found. Check your Order ID and phone number.";
+    result.textContent = "Order not found.";
     return;
   }
 
@@ -490,11 +489,9 @@ const supabaseClient = window.supabase.createClient(
     "Product: " + order.product_name +
     "\nOrder Status: " + order.order_status +
     "\nPayment Status: " + order.payment_status;
+
   result.style.whiteSpace = "pre-line";
 }
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);</script>
  
 <!-- Bermart Data Shop customer dashboard -->
 <section id="customer-dashboard" style="max-width:600px;margin:30px auto;padding:20px;border:1px solid #ddd;border-radius:12px;font-family:Arial,sans-serif;">
