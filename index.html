@@ -394,34 +394,10 @@ async function showNetwork(network, button) {
 }
 
   
-function sendWhatsApp(message){
-
- window.location.href = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(message);
-
-}
-
-function dataOrder(event){
-
- event.preventDefault();
-
- const network = document.getElementById("chosenNetwork").value;
-
- const bundle = document.getElementById("chosenBundle").value;
-
- const phone = document.getElementById("customerPhone").value.trim();
-
- if(!bundle){alert("Please choose a data bundle.");return;}
-
- const price = prices[network][bundle];
-
- sendWhatsApp("BERMART DATA SHOP - DATA ORDER\nNetwork: "+network+
-
- "\nBundle: "+bundle+"\nRecipient phone: "+phone+
-
- "\nListed price: GH₵"+price.toFixed(2)+
-
- "\nPlease confirm availability and payment.");
-
+function sendWhatsApp(message) {
+  window.location.href =
+    "https://wa.me/" + waNumber + "?text=" +
+    encodeURIComponent(message);
 }
 
 async function dataOrder(event) {
@@ -448,7 +424,7 @@ async function dataOrder(event) {
       .single();
 
     if (priceError || !priceRow) {
-      throw new Error("Could not find the current bundle price.");
+      throw new Error("Could not find the bundle price.");
     }
 
     const { data, error } = await supabaseClient
@@ -470,33 +446,31 @@ async function dataOrder(event) {
     if (error) throw error;
 
     alert(
-      "Your order was submitted successfully!\n\n" +
+      "Order submitted successfully!\n" +
       "Order ID: " + data.id +
-      "\nAmount: GH₵" + Number(priceRow.price_ghs).toFixed(2) +
       "\nPayment status: Pending"
     );
 
   } catch (error) {
-    alert("Order could not be submitted: " + error.message);
+    alert("Order error: " + error.message);
   } finally {
     if (button) button.disabled = false;
   }
 }
 
- event.preventDefault();
+function pinOrder(event, exam) {
+  event.preventDefault();
 
- const prefix = exam === "WASSCE" ? "w" : "b";
+  const prefix = exam === "WASSCE" ? "w" : "b";
+  const phone = document.getElementById(prefix + "phone").value.trim();
+  const qty = document.getElementById(prefix + "qty").value;
 
- const phone = document.getElementById(prefix+"phone").value.trim();
-
- const qty = document.getElementById(prefix+"qty").value;
-
- sendWhatsApp("BERMART DATA SHOP - "+exam+" PIN ORDER\nQuantity: "+qty+
-
- "\nCustomer phone: "+phone+"\nPlease confirm PIN availability, price and payment.");
-
+  sendWhatsApp(
+    "BERMART DATA SHOP - " + exam +
+    " PIN ORDER\nQuantity: " + qty +
+    "\nCustomer phone: " + phone
+  );
 }
-
 showNetwork("MTN",document.querySelector(".network"));
 
 </script>
