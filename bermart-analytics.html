@@ -102,6 +102,17 @@ button{
 <h2>Best-selling Network</h2>
 <div class="metric" id="bestNetwork">Not available yet</div>
 <section>
+ <section>
+<h2>Customer Management</h2>
+<input id="customerSearch" type="search"
+placeholder="Search customer by name or phone"
+oninput="renderCustomers()">
+
+<small>Total Customers</small>
+<div class="metric" id="customerCount">0</div>
+
+<div id="customerList">No customers yet.</div>
+</section>
 <h2>Sales & Orders Management</h2>
 
 <input id="orderSearch" type="search"
@@ -216,7 +227,8 @@ allOrders = data;
   best && best[1]>0 ? best[0]+" ("+best[1]+" paid orders)" : "Not available yet";
 
  renderOrders();
- await loadProfit();
+renderCustomers();
+await loadProfit();
 }
 
 function renderOrders(){
@@ -307,7 +319,60 @@ item.appendChild(saveCostBtn);
   recent.appendChild(item);
  });
 }
+function renderCustomers(){
+ const search=document.getElementById("customerSearch").value.toLowerCase();
+ const customerList=document.getElementById("customerList");
+ const customers={};
 
+ allOrders.forEach(order=>{
+  const phone=order.customer_phone||"No phone";
+  const name=order.customer_name||"Unknown";
+
+  if(!customers[phone]){
+   customers[phone]={
+    name:name,
+    phone:phone,
+    orders:0,
+    spent:0
+   };
+  }
+
+  customers[phone].orders++;
+
+  if((order.payment_status||"").toLowerCase()==="paid"){
+   customers[phone].spent+=Number(order.amount_ghs||0);
+  }
+ });
+
+ const filtered=Object.values(customers).filter(customer=>
+  customer.name.toLowerCase().includes(search)||
+  customer.phone.toLowerCase().includes(search)
+ );
+
+ document.getElementById("customerCount").textContent=
+  Object.keys(customers).length;
+
+ customerList.innerHTML="";
+
+ if(filtered.length===0){
+  customerList.textContent="No customers found.";
+  return;
+ }
+
+ filtered.forEach(customer=>{
+  const card=document.createElement("div");
+  card.className="order";
+
+  card.textContent=
+   "Customer: "+customer.name+
+   "\nPhone: "+customer.phone+
+   "\nOrders: "+customer.orders+
+   "\nTotal Spent: GH₵"+customer.spent.toFixed(2);
+
+  card.style.whiteSpace="pre-line";
+  customerList.appendChild(card);
+ });
+}
 async function updateOrder(id,changes){
  if(!confirm("Are you sure you want to update this order?"))return;
 
