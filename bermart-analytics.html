@@ -414,7 +414,23 @@ function renderCustomers(){
  filtered.forEach(customer=>{
   const card=document.createElement("div");
   card.className="order";
+ const historyButton = document.createElement("button");
+historyButton.textContent = "View Order History";
 
+historyButton.onclick = () => {
+  const history = allOrders.filter(order =>
+    (order.customer_phone || "No phone") === customer.phone
+  );
+
+  const details = history.map(order =>
+    "Product: " + (order.product_name || "Unknown") +
+    "\nAmount: GH₵" + Number(order.amount_ghs || 0).toFixed(2) +
+    "\nPayment: " + (order.payment_status || "Unknown") +
+    "\nDate: " + new Date(order.created_at).toLocaleString()
+  ).join("\n\n");
+
+  alert(details || "No order history found.");
+};
   card.textContent=
    "Customer: "+customer.name+
    "\nPhone: "+customer.phone+
@@ -422,6 +438,7 @@ function renderCustomers(){
    "\nTotal Spent: GH₵"+customer.spent.toFixed(2);
 
   card.style.whiteSpace="pre-line";
+  card.appendChild(historyButton);
   customerList.appendChild(card);
  });
 }
