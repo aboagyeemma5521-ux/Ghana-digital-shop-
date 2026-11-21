@@ -238,7 +238,7 @@ footer{text-align:center;padding:25px;color:#64748b}
 
 <h2>WASSCE Checker PIN</h2>
 
-<p>WASSCE Checker PIN — GH₵30 per PIN.</p>
+<p id="wasscePriceText">WASSCE Checker PIN — Loading price...</p>
 
 <form onsubmit="pinOrder(event,'WASSCE')">
 
@@ -264,7 +264,7 @@ footer{text-align:center;padding:25px;color:#64748b}
 
 <h2>BECE Checker PIN</h2>
 
-<p>BECE Checker PIN — GH₵30 per PIN.</p>
+<p id="becePriceText">BECE Checker PIN — Loading price...</p>
  
 <form onsubmit="pinOrder(event,'BECE')">
 
@@ -457,7 +457,28 @@ async function dataOrder(event) {
     if (button) button.disabled = false;
   }
 }
+async function loadPinPrices() {
+  const { data, error } = await supabaseClient
+    .from("products")
+    .select("product_code, price_ghs")
+    .in("product_code", ["wassce-pin", "bece-pin"]);
 
+  if (error || !data) return;
+
+  data.forEach(product => {
+    const price = Number(product.price_ghs).toFixed(2);
+
+    if (product.product_code === "wassce-pin") {
+      document.getElementById("wasscePriceText").textContent =
+        "WASSCE Checker PIN — GH₵" + price + " per PIN.";
+    }
+
+    if (product.product_code === "bece-pin") {
+      document.getElementById("becePriceText").textContent =
+        "BECE Checker PIN — GH₵" + price + " per PIN.";
+    }
+  });
+}
 async function pinOrder(event, exam) {
   event.preventDefault();
 
@@ -474,7 +495,18 @@ async function pinOrder(event, exam) {
   if (button) button.disabled = true;
 
   try {
-    const price = 30;
+    const { data: pinPriceRow, error: pinPriceError } = await supabaseClient
+  .from("products")
+  .select("price_ghs")
+  .eq("product_code", exam === "WASSCE" ? "wassce-pin" : "bece-pin")
+  .single();
+
+if (pinPriceError || !pinPriceRow) {
+  alert("Could not load PIN price. Please try again.");
+  return;
+}
+
+const price = Number(pinPriceRow.price_ghs);
     const total = price * qty;
 
     const { data, error } = await supabaseClient
@@ -885,6 +917,7 @@ alert("Products loaded: " + (data ? data.length : 0));
 }
 
 document.addEventListener("DOMContentLoaded", loadShopPrices);
+  loadPinPrices();
 </script>
   <section id="order-tracking" style="max-width:600px;margin:30px auto;padding:20px;background:#10131b;color:white;border-radius:12px;">
   <h2>Track Your Order</h2>
