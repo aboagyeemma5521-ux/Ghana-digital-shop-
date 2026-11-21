@@ -499,6 +499,7 @@ async function loadPinPrices() {
     }
   });
 }
+
 async function pinOrder(event, exam) {
   event.preventDefault();
 
@@ -515,18 +516,18 @@ async function pinOrder(event, exam) {
   if (button) button.disabled = true;
 
   try {
-    const { data: pinPriceRow, error: pinPriceError } = await supabaseClient
-  .from("products")
-  .select("price_ghs")
-  .eq("product_code", exam === "WASSCE" ? "wassce-pin" : "bece-pin")
-  .single();
+    const { data: pinPriceRow, error: pinPriceError } =
+      await supabaseClient
+        .from("products")
+        .select("price_ghs")
+        .eq("product_code", exam === "WASSCE" ? "wassce-pin" : "bece-pin")
+        .single();
 
-if (pinPriceError || !pinPriceRow) {
-  alert("Could not load PIN price. Please try again.");
-  return;
-}
+    if (pinPriceError || !pinPriceRow) {
+      throw new Error("Could not load PIN price.");
+    }
 
-const price = Number(pinPriceRow.price_ghs);
+    const price = Number(pinPriceRow.price_ghs);
     const total = price * qty;
 
     const { data, error } = await supabaseClient
@@ -547,12 +548,28 @@ const price = Number(pinPriceRow.price_ghs);
     if (error) throw error;
 
     alert(
-      exam + " order submitted successfully!\n" +
+      "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
+      "\nExam: " + exam + " Checker PIN" +
+      "\nQuantity: " + qty +
+      "\nPhone: " + phone +
+      "\nTotal: GH₵" + total.toFixed(2) +
+      "\n\nMTN MoMo Payment Number: 0530275829" +
+      "\n\nPayment Status: PENDING" +
+      "\nPlease make payment and confirm your order."
+    );
+
+    const message =
+      "Hello Bermart Data Shop. I want to confirm my PIN order." +
+      "\nOrder ID: " + data.id +
+      "\nExam: " + exam + " Checker PIN" +
       "\nQuantity: " + qty +
       "\nTotal: GH₵" + total.toFixed(2) +
-      "\nPayment status: Pending"
-    );
+      "\nPhone: " + phone;
+
+    if (confirm("Would you like to open WhatsApp to confirm your order?")) {
+      sendWhatsApp(message);
+    }
 
   } catch (error) {
     alert("PIN order error: " + error.message);
@@ -560,6 +577,7 @@ const price = Number(pinPriceRow.price_ghs);
     if (button) button.disabled = false;
   }
 }
+
 showNetwork("MTN",document.querySelector(".network"));
 
 </script>
