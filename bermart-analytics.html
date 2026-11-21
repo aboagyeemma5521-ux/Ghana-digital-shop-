@@ -86,6 +86,27 @@ button{
 
 <section>
 <h2>Profit & Expenses</h2>
+ <section>
+  <h2>Business Overview</h2>
+  <div class="grid">
+    <div>
+      <small>Total Sales</small>
+      <div class="metric" id="totalSales">GH₵0.00</div>
+    </div>
+    <div>
+      <small>Total Orders</small>
+      <div class="metric" id="totalOrders">0</div>
+    </div>
+    <div>
+      <small>Pending Payments</small>
+      <div class="metric" id="pendingOrders">0</div>
+    </div>
+    <div>
+      <small>Customers</small>
+      <div class="metric" id="totalCustomers">0</div>
+    </div>
+  </div>
+</section>
 <div class="grid">
  <section>
   <small>Total Product Costs</small>
@@ -100,6 +121,8 @@ button{
  <section>
   <small>Net Profit</small>
   <div class="metric" id="netProfit">GH₵0.00</div>
+  <small>Total Profit</small>
+<div class="metric" id="totalProfit">GH₵0.00</div>
  </section>
 </div>
 
@@ -224,6 +247,16 @@ allOrders = data;
 
  document.getElementById("daily").textContent=total(dailySales).toFixed(2);
  document.getElementById("monthly").textContent=total(monthlySales).toFixed(2);
+ document.getElementById("totalSales").textContent =
+  "GH₵" + total(paidOrders).toFixed(2);
+
+document.getElementById("totalOrders").textContent = data.length;
+
+document.getElementById("pendingOrders").textContent =
+  data.filter(o => o.payment_status === "pending").length;
+
+document.getElementById("totalCustomers").textContent =
+  new Set(data.map(o => o.customer_phone).filter(Boolean)).size;
  document.getElementById("customers").textContent=
   new Set(data.map(o=>o.customer_phone).filter(Boolean)).size;
  document.getElementById("ordersCount").textContent=data.length;
@@ -497,6 +530,8 @@ async function updateOrder(id,changes){
  document.getElementById("totalCosts").textContent="GH₵"+costs.toFixed(2);
  document.getElementById("totalExpenses").textContent="GH₵"+totalExpenses.toFixed(2);
  document.getElementById("netProfit").textContent=
+  document.getElementById("totalProfit").textContent =
+  "GH₵" + (sales - costs - totalExpenses).toFixed(2);
   "GH₵"+(sales-costs-totalExpenses).toFixed(2);
 }
 
@@ -644,65 +679,7 @@ async function logout(){
 }
 
 checkAdmin();
-</script>
- <!-- BERMART BUSINESS OVERVIEW -->
-<section id="businessOverview">
-  <h2>Sales & Profit Analytics</h2>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h3>Total Sales</h3>
-      <p id="totalSales">GH₵0.00</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Total Profit</h3>
-      <p id="totalProfit">GH₵0.00</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Total Orders</h3>
-      <p id="totalOrders">0</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Pending Orders</h3>
-      <p id="pendingOrders">0</p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Customers</h3>
-      <p id="totalCustomers">0</p>
-    </div>
-  </div>
-
-  <h2>Customer Management</h2>
-  <div id="customerManagement">
-    Loading customers...
-  </div>
-</section>
-
-<style>
-#businessOverview {
-  margin-top: 30px;
-  padding: 20px;
-  background: #10131b;
-  color: white;
-  border-radius: 12px;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-  gap: 12px;
-}
-
-.stat-card {
-  background: #1d2635;
-  padding: 15px;
-  border-radius: 10px;
-}
-</style>
+</script> 
 </body>
 </html>
 
