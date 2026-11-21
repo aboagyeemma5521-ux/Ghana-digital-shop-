@@ -400,6 +400,7 @@ function sendWhatsApp(message) {
     encodeURIComponent(message);
 }
 
+
 async function dataOrder(event) {
   event.preventDefault();
 
@@ -427,6 +428,8 @@ async function dataOrder(event) {
       throw new Error("Could not find the bundle price.");
     }
 
+    const amount = Number(priceRow.price_ghs);
+
     const { data, error } = await supabaseClient
       .from("shop_orders")
       .insert({
@@ -435,7 +438,7 @@ async function dataOrder(event) {
         product_type: "data",
         network: network,
         product_name: network + " " + bundle,
-        amount_ghs: Number(priceRow.price_ghs),
+        amount_ghs: amount,
         order_status: "pending",
         payment_status: "pending",
         quantity: 1
@@ -446,10 +449,26 @@ async function dataOrder(event) {
     if (error) throw error;
 
     alert(
-      "Order submitted successfully!\n" +
+      "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
-      "\nPayment status: Pending"
+      "\nProduct: " + network + " " + bundle +
+      "\nPhone: " + phone +
+      "\nAmount: GH₵" + amount.toFixed(2) +
+      "\n\nMTN MoMo Payment Number: 0530275829" +
+      "\n\nPayment Status: PENDING" +
+      "\nPlease make payment and confirm your order."
     );
+
+    const message =
+      "Hello Bermart Data Shop. I have made payment." +
+      "\nOrder ID: " + data.id +
+      "\nProduct: " + network + " " + bundle +
+      "\nAmount: GH₵" + amount.toFixed(2) +
+      "\nPhone: " + phone;
+
+    if (confirm("Would you like to open WhatsApp to confirm your order?")) {
+      sendWhatsApp(message);
+    }
 
   } catch (error) {
     alert("Order error: " + error.message);
@@ -457,6 +476,7 @@ async function dataOrder(event) {
     if (button) button.disabled = false;
   }
 }
+
 async function loadPinPrices() {
   const { data, error } = await supabaseClient
     .from("products")
