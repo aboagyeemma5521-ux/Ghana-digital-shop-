@@ -187,9 +187,10 @@ async function checkAdmin(){
   return;
  }
 
- document.getElementById("login").classList.add("hidden");
+  document.getElementById("login").classList.add("hidden");
  document.getElementById("dashboard").classList.remove("hidden");
  await loadAnalytics();
+ await loadPriceManager();
 }
 let allOrders = [];
 async function loadAnalytics(){
