@@ -1030,9 +1030,15 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
   <p>Test how the payment checkout experience will look.</p>
   <p><strong>Mode:</strong> DEMO ONLY</p>
 
-  <button type="button" onclick="bermartDemoPayment()">
-    Test Payment
-  </button>
+  <button type="button" onclick="bermartDemoPayment({
+  orderId: 'DEMO-001',
+  product: 'MTN 1GB',
+  phone: 'Demo only',
+  amount: 6,
+  quantity: 1
+})">
+  Test Payment
+</button>
 
   <div id="bermart-demo-result"></div>
 </section>
