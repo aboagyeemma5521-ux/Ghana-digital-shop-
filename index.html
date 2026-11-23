@@ -448,12 +448,23 @@ async function dataOrder(event) {
       .single();
 
     if (error) throw error;
-    bermartDemoPayment({
-  orderId: data.id,
-  product: network + " " + bundle,
-  phone: phone,
-  amount: amount
-});
+    const { data: paymentTest, error: paymentError } =
+  await supabaseClient.functions.invoke(
+    "initialize-paystack-test",
+    {
+      body: {
+        orderId: data.id,
+        amount: amount,
+        phone: phone
+      }
+    }
+  );
+
+if (paymentError) {
+  throw paymentError;
+}
+
+console.log("Paystack test response:", paymentTest);
     alert(
       "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
