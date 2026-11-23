@@ -993,7 +993,8 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
 </section>
 </body>
   
-<!-- BERMART DEMO CHECKOUT -->
+
+<!-- BERMART DEMO CHECKOUT POPUP -->
 <style>
 #bermart-demo {
   background: #151b2b;
@@ -1002,8 +1003,8 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
   margin: 25px auto;
   max-width: 500px;
   border-radius: 14px;
-  font-family: Arial, sans-serif;
   border: 1px solid #34415c;
+  font-family: Arial, sans-serif;
 }
 #bermart-demo h2 {
   color: #65aaff;
@@ -1012,58 +1013,87 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
   background: #0878e8;
   color: white;
   border: 0;
-  padding: 13px 20px;
+  padding: 14px;
   border-radius: 8px;
   font-weight: bold;
   width: 100%;
-  margin-top: 12px;
 }
-#bermart-demo-result {
-  margin-top: 15px;
-  white-space: pre-line;
-  line-height: 1.6;
+#bermart-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+#bermart-popup-box {
+  background: #151b2b;
+  color: white;
+  border: 1px solid #34415c;
+  border-radius: 15px;
+  padding: 22px;
+  width: 100%;
+  max-width: 430px;
+  line-height: 1.7;
+}
+#bermart-popup-box h2 {
+  color: #65aaff;
+}
+#bermart-popup-close {
+  margin-top: 18px;
 }
 </style>
 
 <section id="bermart-demo">
   <h2>Bermart Demo Checkout</h2>
-  <p>Test how the payment checkout experience will look.</p>
+  <p>Preview the payment checkout experience.</p>
   <p><strong>Mode:</strong> DEMO ONLY</p>
 
   <button type="button" onclick="bermartDemoPayment({
-  orderId: 'DEMO-001',
-  product: 'MTN 1GB',
-  phone: 'Demo only',
-  amount: 6,
-  quantity: 1
-})">
-  Test Payment
-</button>
-
-  <div id="bermart-demo-result"></div>
+    orderId: 'DEMO-001',
+    product: 'MTN 1GB',
+    phone: 'Demo only',
+    amount: 6,
+    quantity: 1
+  })">
+    Test Payment
+  </button>
 </section>
 
+<div id="bermart-popup">
+  <div id="bermart-popup-box">
+    <h2>Bermart Checkout</h2>
+    <div id="bermart-popup-details"></div>
+    <button id="bermart-popup-close"
+      type="button"
+      onclick="document.getElementById('bermart-popup').style.display='none'">
+      Close
+    </button>
+  </div>
+</div>
+
 <script>
-
 function bermartDemoPayment(order = null) {
-  const result = document.getElementById("bermart-demo-result");
+  if (!order) return;
 
-  if (!order) {
-    result.textContent = "No order details received.";
-    return;
-  }
+  const details = document.getElementById("bermart-popup-details");
 
-  result.textContent =
-    "BERMART DEMO CHECKOUT\n\n" +
+  details.textContent =
     "Order ID: " + order.orderId + "\n" +
     "Product: " + order.product + "\n" +
     "Phone: " + order.phone + "\n" +
     (order.quantity ? "Quantity: " + order.quantity + "\n" : "") +
-    "Amount: GH₵" + Number(order.amount).toFixed(2) + "\n\n" +
-    "Payment Status: PENDING\n" +
-    "DEMO ONLY — No money collected.";
+    "Amount: GH₵" + Number(order.amount).toFixed(2) +
+    "\n\nPayment Status: PENDING" +
+    "\nDEMO ONLY — No money collected.";
+
+  details.style.whiteSpace = "pre-line";
+
+  document.getElementById("bermart-popup").style.display = "flex";
 }
 </script>
-<!-- END BERMART DEMO CHECKOUT -->
+<!-- END BERMART DEMO CHECKOUT POPUP -->
 
 </html>
