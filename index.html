@@ -981,4 +981,62 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
   <div id="trackingResult" style="margin-top:15px;"></div>
 </section>
 </body>
+  
+<!-- BERMART DEMO CHECKOUT -->
+<style>
+#bermart-demo {
+  background: #151b2b;
+  color: white;
+  padding: 20px;
+  margin: 25px auto;
+  max-width: 500px;
+  border-radius: 14px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #34415c;
+}
+#bermart-demo h2 {
+  color: #65aaff;
+}
+#bermart-demo button {
+  background: #0878e8;
+  color: white;
+  border: 0;
+  padding: 13px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  width: 100%;
+  margin-top: 12px;
+}
+#bermart-demo-result {
+  margin-top: 15px;
+  white-space: pre-line;
+  line-height: 1.6;
+}
+</style>
+
+<section id="bermart-demo">
+  <h2>Bermart Demo Checkout</h2>
+  <p>Test how the payment checkout experience will look.</p>
+  <p><strong>Mode:</strong> DEMO ONLY</p>
+
+  <button type="button" onclick="bermartDemoPayment()">
+    Test Payment
+  </button>
+
+  <div id="bermart-demo-result"></div>
+</section>
+
+<script>
+function bermartDemoPayment() {
+  const result = document.getElementById("bermart-demo-result");
+
+  result.textContent =
+    "DEMO PAYMENT STARTED\n\n" +
+    "This is a simulated checkout.\n" +
+    "No money has been collected.\n" +
+    "No order has been marked as paid.";
+}
+</script>
+<!-- END BERMART DEMO CHECKOUT -->
+
 </html>
