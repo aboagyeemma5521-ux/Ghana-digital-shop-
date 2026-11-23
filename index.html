@@ -552,7 +552,13 @@ async function pinOrder(event, exam) {
       .single();
 
     if (error) throw error;
-
+    bermartDemoPayment({
+  orderId: data.id,
+  product: exam + " Checker PIN",
+  phone: phone,
+  amount: total,
+  quantity: qty
+});
     alert(
       "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
@@ -1037,10 +1043,7 @@ function bermartDemoPayment(order = null) {
   const result = document.getElementById("bermart-demo-result");
 
   if (!order) {
-    result.textContent =
-      "DEMO PAYMENT\n\n" +
-      "No order details received yet.\n" +
-      "No money has been collected.";
+    result.textContent = "No order details received.";
     return;
   }
 
@@ -1049,12 +1052,11 @@ function bermartDemoPayment(order = null) {
     "Order ID: " + order.orderId + "\n" +
     "Product: " + order.product + "\n" +
     "Phone: " + order.phone + "\n" +
+    (order.quantity ? "Quantity: " + order.quantity + "\n" : "") +
     "Amount: GH₵" + Number(order.amount).toFixed(2) + "\n\n" +
-    "Payment Status: DEMO ONLY\n" +
-    "No money collected.\n" +
-    "Your order is still pending.";
+    "Payment Status: PENDING\n" +
+    "DEMO ONLY — No money collected.";
 }
-
 </script>
 <!-- END BERMART DEMO CHECKOUT -->
 
