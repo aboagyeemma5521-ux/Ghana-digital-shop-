@@ -448,7 +448,12 @@ async function dataOrder(event) {
       .single();
 
     if (error) throw error;
-
+    bermartDemoPayment({
+  orderId: data.id,
+  product: network + " " + bundle,
+  phone: phone,
+  amount: amount
+});
     alert(
       "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
@@ -1027,15 +1032,29 @@ document.addEventListener("DOMContentLoaded", loadShopPrices);
 </section>
 
 <script>
-function bermartDemoPayment() {
+
+function bermartDemoPayment(order = null) {
   const result = document.getElementById("bermart-demo-result");
 
+  if (!order) {
+    result.textContent =
+      "DEMO PAYMENT\n\n" +
+      "No order details received yet.\n" +
+      "No money has been collected.";
+    return;
+  }
+
   result.textContent =
-    "DEMO PAYMENT STARTED\n\n" +
-    "This is a simulated checkout.\n" +
-    "No money has been collected.\n" +
-    "No order has been marked as paid.";
+    "BERMART DEMO CHECKOUT\n\n" +
+    "Order ID: " + order.orderId + "\n" +
+    "Product: " + order.product + "\n" +
+    "Phone: " + order.phone + "\n" +
+    "Amount: GH₵" + Number(order.amount).toFixed(2) + "\n\n" +
+    "Payment Status: DEMO ONLY\n" +
+    "No money collected.\n" +
+    "Your order is still pending.";
 }
+
 </script>
 <!-- END BERMART DEMO CHECKOUT -->
 
