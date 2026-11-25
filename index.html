@@ -528,9 +528,10 @@ async function pinOrder(event, exam) {
 
   const prefix = exam === "WASSCE" ? "w" : "b";
   const phone = document.getElementById(prefix + "phone").value.trim();
+  const email = document.getElementById(prefix + "email").value.trim();
   const qty = Number(document.getElementById(prefix + "qty").value);
 
-  if (!phone || !Number.isInteger(qty) || qty < 1) {
+  if (!phone || !email || !Number.isInteger(qty) || qty < 1) {
     alert("Please enter a valid phone number and quantity.");
     return;
   }
@@ -574,10 +575,11 @@ async function pinOrder(event, exam) {
     "initialize-paystack-test",
     {
       body: {
-        orderId: data.id,
-        amount: amount,
-        phone: phone
-      }
+  orderId: data.id,
+  amount: total,
+  phone: phone,
+  email: email
+}
     }
   );
 
