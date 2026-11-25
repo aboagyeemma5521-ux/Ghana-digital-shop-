@@ -472,7 +472,11 @@ if (paymentError) {
   throw paymentError;
 }
 
-console.log("Paystack test response:", paymentTest);
+if (!paymentTest?.success || !paymentTest?.authorization_url) {
+  throw new Error("Could not create Paystack checkout.");
+}
+
+window.location.href = paymentTest.authorization_url;
     alert(
       "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
@@ -589,7 +593,11 @@ if (paymentError) {
   throw paymentError;
 }
 
-console.log("Paystack test response:", paymentTest);
+if (!paymentTest?.success || !paymentTest?.authorization_url) {
+  throw new Error("Could not create Paystack checkout.");
+}
+
+window.location.href = paymentTest.authorization_url;
     alert(
       "BERMART ORDER SUCCESSFUL!\n\n" +
       "Order ID: " + data.id +
