@@ -409,12 +409,16 @@ async function dataOrder(event) {
   const network = document.getElementById("chosenNetwork").value;
   const bundle = document.getElementById("chosenBundle").value;
   const phone = document.getElementById("customerPhone").value.trim();
+  const email = document.getElementById("customerEmail").value.trim();
 
   if (!bundle || !phone) {
     alert("Please select a bundle and enter your phone number.");
     return;
   }
-
+if (!email) {
+  alert("Please enter your email address.");
+  return;
+}
   const button = event.submitter;
   if (button) button.disabled = true;
 
@@ -454,10 +458,11 @@ async function dataOrder(event) {
     "initialize-paystack-test",
     {
       body: {
-        orderId: data.id,
-        amount: amount,
-        phone: phone
-      }
+  orderId: data.id,
+  amount: amount,
+  phone: phone,
+  email: email
+     }
     }
   );
 
